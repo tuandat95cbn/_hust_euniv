@@ -21,5 +21,10 @@ public class mRoomsServiceImpl implements mRoomsService {
 		// TODO Auto-generated method stub
 		return dao.getListRoomCapacity();
 	}
+	@Override
+	public int getNumberRoom() {
+		// TODO Auto-generated method stub
+		return dao.getNumberRoom();
+	}
 	
 }

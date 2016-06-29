@@ -1,7 +1,9 @@
 package vn.webapp.modules.timetablemanagement.controller;
 
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +34,9 @@ public class mRegularTimeTableController {
 		
 		model.put("regularCourseTimeTable", regularCourseTimeTableService.getAllCourseTimeTable());
 		System.out.println(2);
-		List<Integer> l= regularCourseTimeTableService.getAllSlotsStart();
-		System.out.println("1"+l);
-		l.clear();
-		l=regularCourseTimeTableService.getAllNumberSlot();
-		System.out.println("1"+l);
+		
+		
+		System.out.println("This is :"+RS.getNumberRoom());
  		return "cp.ViewRegularTimeTable";
 	}
 	

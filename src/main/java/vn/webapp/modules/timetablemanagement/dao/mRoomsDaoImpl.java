@@ -47,7 +47,11 @@ public class mRoomsDaoImpl extends BaseDao implements mRoomsDao {
 		try{
 			begin();
 			Criteria criteria= getSession().createCriteria(mRooms.class).setProjection(Projections.property("R_Capacity"));;
-			List lR = criteria.list();
+			List<Integer> lR = criteria.list();
+			for(int i=0;i<lR.size();i++){
+				Integer ie= lR.get(i);
+				if(ie.intValue()==-1) lR.set(i, 500);
+			}
 			commit();
 			return lR;
 			} catch (HibernateException e){
@@ -60,6 +64,27 @@ public class mRoomsDaoImpl extends BaseDao implements mRoomsDao {
 				close();
 			}
 
+	}
+	@Override
+	public int getNumberRoom() {
+		// TODO Auto-generated method stub
+		try{
+			begin();
+			Criteria criteria= getSession().createCriteria(mRooms.class).setProjection(Projections.rowCount());;
+			Integer rowCount=((Long) criteria.uniqueResult()).intValue();
+			
+			commit();
+			return rowCount;
+			} catch (HibernateException e){
+				e.printStackTrace();
+				rollback();
+				close();
+				return -1;
+			} finally {
+				flush();
+				close();
+			}
+		
 	}
 
 }

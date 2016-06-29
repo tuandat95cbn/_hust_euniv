@@ -17,4 +17,11 @@ public interface mRegularCourseTimeTableDAO {
 	public int countCourseOnSaturdayInTCandD9();
 	public List<Integer> getCourseRoom();
 	public List<Set<Integer>> getListSetWeek();
+	public int getMaxWeeks();
+	public int getMinWeeks();
+	public List<String> getCourseSemesterType();
+	
+	public List<String> getClassCodeOfCourse();
+	
+	public List<Integer> getMaxCoursesRegister();
 }

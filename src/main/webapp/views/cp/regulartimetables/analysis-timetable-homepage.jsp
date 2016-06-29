@@ -23,53 +23,28 @@
             -->
               
             <input id="input-file" name="timetable[]" type="file" multiple=true class="file-loading">
-            
+            <br/>
+            <button id="btn-analyse" disabled class="btn btn-primary">Analyse</button>
         </div>
         <!-- /.col-lg-12 -->
     </div>
  </div>
  
-<script src="<c:url value="/assets/libs/fileinput/js/locales/fa.js" />"></script> 
 <script src="<c:url value="/assets/libs/fileinput/js/fileinput.min.js"/>"></script>
  <script>
 $(document).ready(function(){
-	
 	 $("#input-file").fileinput({
-		    uploadUrl: "upload-file-timetable.html", // server upload action
-		    uploadAsync: true,
-		    //maxFileCount: 5
-		}); 
-	 
-	/*
-	 $("#inputFile").click(function(){
-		$("#input-file-name").val($("#inputFile").val());
-		$("#upload").show();
-		//window.location = baseUrl+"/cp/upload-file-timetable.html";
-	});
+	 	uploadUrl: "upload-file-timetable.html", // server upload action
+		uploadAsync: true,
+		allowedFileExtensions:['xlsx'],
+		maxFileCount: 1
+	  }).on('fileuploaded', function() {
+		 $("#btn-analyse").removeAttr('disabled');
+	 });
 	
-	$("#upload").click(function(){
-		$("#input-file-name").val("");
-		$("#upload").hide();
-		
-		//var inputFile = $("#inputFile").file[0];
-		var eData = new FormData();
-		eData.append("file",inputFile.files[0]);
-		
-		$.ajax({
-			type: 'post',
-			url: 'upload-file-timetable.html',
-			data: eData,
-			enctype:'multipart/form-data',
-			processData: false,
-			contentType: false,
-			success: function(data){
-				console.log(data);
-			},
-			error: function(e){
-				alert(e);
-			}
-		});
-	});*/
+	 $("#btn-analyse").click(function(){
+		window.location = baseUrl+"/cp/analyse-timetable";
+	});
  });
  </script>
  

@@ -1,6 +1,7 @@
 package vn.webapp.modules.timetablemanagement.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,5 +75,37 @@ public class mRegularCourseTimeTableServiceImpl implements mRegularCourseTimeTab
 		// TODO Auto-generated method stub
 		return dao.getCourseRoom();
 	}
+	@Override
+	public int getMaxWeeks() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	@Override
+	public int getMinWeeks() {
+		// TODO Auto-generated method stub
+		return dao.getMinWeeks();
+	}
+	
+	@Override
+	public List<String> getCourseSemesterType() {
+		// TODO Auto-generated method stub
+		return dao.getCourseSemesterType();
+	}
 
+	@Override
+	public List<String> getClassCodeOfCourse() {
+		// TODO Auto-generated method stub
+		return dao.getClassCodeOfCourse();
+	}
+
+	@Override
+	public List<Integer> getCourseMaxRegister() {
+		// TODO Auto-generated method stub
+		return dao.getMaxCoursesRegister();
+	}
+	@Override
+	public List<Set<Integer>> getListSetWeek() {
+		// TODO Auto-generated method stub
+		return dao.getListSetWeek();
+	}
 }

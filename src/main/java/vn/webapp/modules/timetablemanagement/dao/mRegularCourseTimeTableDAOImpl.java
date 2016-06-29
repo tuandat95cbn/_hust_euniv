@@ -34,6 +34,7 @@ public class mRegularCourseTimeTableDAOImpl extends BaseDao implements mRegularC
 		try{
 		begin();
 		Criteria criteria= getSession().createCriteria(mRegularCourseTimeTable.class);
+		//criteria.setMaxResults(300);
 		criteria.add(Restrictions.and(Restrictions.and(Restrictions.ne("RCTT_Day", 0),
 				Restrictions.isNotNull("RCTT_Slots")), Restrictions.and(
 				Restrictions.isNotNull("RCTT_Room_Code"),
@@ -114,16 +115,20 @@ public class mRegularCourseTimeTableDAOImpl extends BaseDao implements mRegularC
 		try{
 			begin();
 			Criteria criteria= getSession().createCriteria(mRegularCourseTimeTable.class).setProjection(Projections.property("RCTT_Day"));
-	
+			//criteria.setMaxResults(300);
 			criteria.add(Restrictions.and(Restrictions.and(Restrictions.ne("RCTT_Day", 0),
 			Restrictions.isNotNull("RCTT_Slots")), Restrictions.and(
 			Restrictions.isNotNull("RCTT_Room_Code"),
 			Restrictions.lt("lengthRCTT_Slots", 6))));
 			
-			List  l = criteria.list();
+			List<Integer>  l = criteria.list();
 			//System.out.println("This is l:"+l);
 			//for(int i=0;i<l.size();i++)
 			//	System.out.println(l.get(i));
+			for(int i=0;i<l.size();i++){
+				Integer s= l.get(i);
+				l.set(i,s-2);
+			}
 			commit();
 			return l;
 			} catch (HibernateException e){
@@ -142,6 +147,7 @@ public class mRegularCourseTimeTableDAOImpl extends BaseDao implements mRegularC
 		try{
 			begin();
 			Criteria criteria= getSession().createCriteria(mRegularCourseTimeTable.class).setProjection(Projections.property("RCTT_Slots"));
+			//criteria.setMaxResults(300);
 			criteria.add(Restrictions.and(Restrictions.and(Restrictions.ne("RCTT_Day", 0),
 			Restrictions.isNotNull("RCTT_Slots")), Restrictions.and(
 			Restrictions.isNotNull("RCTT_Room_Code"),
@@ -151,7 +157,7 @@ public class mRegularCourseTimeTableDAOImpl extends BaseDao implements mRegularC
 			List<Integer> listInt= new ArrayList<>();
 			for(int i=0;i<l.size();i++){
 				String s= l.get(i);
-				listInt.add(Integer.parseInt(s.substring(0, s.indexOf("-"))));
+				listInt.add(Integer.parseInt(s.substring(0, s.indexOf("-")))-1);
 			}
 			commit();
 			return listInt;
@@ -172,6 +178,7 @@ public class mRegularCourseTimeTableDAOImpl extends BaseDao implements mRegularC
 		try{
 			begin();
 			Criteria criteria= getSession().createCriteria(mRegularCourseTimeTable.class).setProjection(Projections.property("RCTT_Slots"));
+			//criteria.setMaxResults(300);
 			criteria.add(Restrictions.and(Restrictions.and(Restrictions.ne("RCTT_Day", 0),
 			Restrictions.isNotNull("RCTT_Slots")), Restrictions.and(
 			Restrictions.isNotNull("RCTT_Room_Code"),
@@ -268,9 +275,11 @@ public class mRegularCourseTimeTableDAOImpl extends BaseDao implements mRegularC
 	@Override
 	public List<Set<Integer>> getListSetWeek() {
 		// TODO Auto-generated method stub
+		int min=getMinWeeks();
 		try{
 			begin();
 			Criteria criteria= getSession().createCriteria(mRegularCourseTimeTable.class).setProjection(Projections.property("RCTT_Weeks"));
+			//criteria.setMaxResults(300);
 			criteria.add(Restrictions.and(Restrictions.and(Restrictions.ne("RCTT_Day", 0),
 			Restrictions.isNotNull("RCTT_Slots")), Restrictions.and(
 			Restrictions.isNotNull("RCTT_Room_Code"),
@@ -278,24 +287,35 @@ public class mRegularCourseTimeTableDAOImpl extends BaseDao implements mRegularC
 			
 			List<String>  l = criteria.list();
 			List<Set<Integer>> list= new ArrayList<>();
+			
+			
+			
 			for(int i=0;i<l.size();i++){
 				String s= l.get(i);
 				s=s+",";
 				Set set= new HashSet<>();
 				while(s.indexOf(",")!=-1){
-					System.out.println(s);
-					if(s.indexOf(",")>s.indexOf("-")){
+					//System.out.println(s);
+					
+					if((s.indexOf("-") !=-1)&& (s.indexOf(",")>s.indexOf("-"))){
 						int start= Integer.parseInt(s.substring(0, s.indexOf("-")));
 						int end = Integer.parseInt(s.substring(s.indexOf("-")+1,s.indexOf(",")));
 						for(int j=start;j<=end;j++){
-							set.add(j);
+							set.add(j-min);
+							//if(j>max) max=j;
+							//if(j<min) min=j;
 						}
+					} else {
+						int z= Integer.parseInt(s.substring(0, s.indexOf(",")));
+						set.add(z-min);
 					}
 					
 					s=s.substring(s.indexOf(",")+1);
 				}
+				//System.out.println(name()+"getListSetWeek resuft set is :" +set);
 				list.add(set);
 			}
+			
 			commit();
 			return list;
 			} catch (HibernateException e){
@@ -307,5 +327,117 @@ public class mRegularCourseTimeTableDAOImpl extends BaseDao implements mRegularC
 				flush();
 				close();
 			}
+	}
+	@Override
+	public int getMaxWeeks() {
+		// TODO Auto-generated method stub
+		
+		return 0;
+	}
+	@Override
+	public int getMinWeeks() {
+		// TODO Auto-generated method stub
+		try{
+			begin();
+			Criteria criteria = getSession()
+				    .createCriteria(mRegularCourseTimeTable.class)
+				    .setProjection(Projections.min("RCTT_Weeks"));
+			String min = (String) criteria.uniqueResult();
+			int res;
+			
+			if(min.indexOf(",")>min.indexOf("-")){
+				res= Integer.parseInt(min.substring(0, min.indexOf("-")));
+			} else {
+				res= Integer.parseInt(min.substring(0, min.indexOf(",")));
+			}
+			System.out.println("This is getMinWeeks"+res);
+			commit();
+			return res;
+			} catch (HibernateException e){
+				e.printStackTrace();
+				rollback();
+				close();
+				return 0;
+			} finally {
+				flush();
+				close();
+			}
+		
+		
+	}
+	@Override
+	public List<String> getCourseSemesterType() {
+		// TODO Auto-generated method stub
+		try{
+			begin();
+			String hql = "SELECT rctte.RCTTE_Semester_Type FROM mRegularCourseTimeTable rctt, mRegularCourseTimeTableEntry rctte"
+					+ " WHERE rctt.RCTT_RCTTE_Code = rctte.RCTTE_Code";
+			Query query = getSession().createQuery(hql);
+			
+			//System.out.println(name()+"::getSemesterType()--result: ");
+			commit();
+			return query.list();
+			
+		}catch(HibernateException e){
+			e.printStackTrace();
+			rollback();
+			close();
+			return null;
+		}finally{
+			flush();
+			close();
+		}
+		
+	}
+
+	@Override
+	public List<String> getClassCodeOfCourse() {
+		// TODO Auto-generated method stub
+		try{
+			
+			begin();
+			String hql =  "SELECT rctte.RCTTE_Class_Code FROM mRegularCourseTimeTable rctt, mRegularCourseTimeTableEntry rctte"
+					+ " WHERE rctt.RCTT_RCTTE_Code = rctte.RCTTE_Code";
+			Query query = getSession().createQuery(hql);
+			commit();
+			
+			//System.out.println(name()+"::getClassCodeOfCourse--result"+query.list());
+			return query.list();
+			
+		}catch(HibernateException e){
+			e.printStackTrace();
+			rollback();
+			close();
+			return null;
+		}finally{
+			flush();
+			close();
+		}
+		
+	}
+
+	@Override
+	public List<Integer> getMaxCoursesRegister() {
+		// TODO Auto-generated method stub
+		try{
+			
+			begin();
+			String hql =  "SELECT rctte.RCTTE_Course_MaxRegister FROM mRegularCourseTimeTable rctt, mRegularCourseTimeTableEntry rctte"
+					+ " WHERE rctt.RCTT_RCTTE_Code = rctte.RCTTE_Code";
+			Query query = getSession().createQuery(hql);
+			commit();
+			
+			//System.out.println(name()+"::getClassCodeOfCourse--result"+query.list());
+			return query.list();
+			
+		}catch(HibernateException e){
+			e.printStackTrace();
+			rollback();
+			close();
+			return null;
+		}finally{
+			flush();
+			close();
+		}
 	}
 }

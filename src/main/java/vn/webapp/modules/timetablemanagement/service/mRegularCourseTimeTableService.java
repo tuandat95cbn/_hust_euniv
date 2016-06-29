@@ -1,6 +1,7 @@
 package vn.webapp.modules.timetablemanagement.service;
 
 import java.util.List;
+import java.util.Set;
 
 import vn.webapp.modules.timetablemanagement.model.mRegularCourseTimeTable;
 
@@ -16,4 +17,10 @@ public interface mRegularCourseTimeTableService {
 	public int countCourseOnSaturday();
 	public int countCourseOnSaturdayInTCandD9();
 	public List<Integer> getCourseRoom();
+	public int getMaxWeeks();
+	public int getMinWeeks();
+	public List<String> getCourseSemesterType();
+	public List<String> getClassCodeOfCourse();
+	public List<Integer> getCourseMaxRegister();
+	public List<Set<Integer>> getListSetWeek();
 }

@@ -577,4 +577,8 @@
         <put-attribute name="title" value="upload regular time table" />                                 
         <put-attribute name="content" value="/views/cp/regulartimetables/analysis-timetable-homepage.jsp" />
     </definition>
+    <definition name="cp.analyseTimetableResultPage" extends="layout.base">
+        <put-attribute name="title" value = "Show result page of analysist timetable "/>
+        <put-attribute name="content" value="/views/cp/regulartimetables/analysist-timetable-resultpage.jsp"></put-attribute>
+    </definition>
 </tiles-definitions>

@@ -3,8 +3,10 @@ package vn.webapp.modules.timetablemanagement.controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -20,9 +22,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import vn.webapp.controller.BaseWeb;
+import vn.webapp.modules.timetablemanagement.algorithm.TimeTable;
 import vn.webapp.modules.timetablemanagement.model.mRegularCourseTimeTable;
 import vn.webapp.modules.timetablemanagement.service.mRegularCourseTimeTableEntryService;
 import vn.webapp.modules.timetablemanagement.service.mRegularCourseTimeTableService;
+import vn.webapp.modules.timetablemanagement.service.mRoomsService;
 
 
 @Controller("cpmTimeTable")
@@ -35,6 +39,9 @@ public class mTimeTableController extends BaseWeb{
 	@Autowired
 	mRegularCourseTimeTableEntryService rcttes;
 	
+	@Autowired
+	mRoomsService mrs;
+	
 	private int previous_class_code = -1;
 	
 	private MultipartFile timetableFile;
@@ -46,11 +53,13 @@ public class mTimeTableController extends BaseWeb{
 	
 	@RequestMapping(value="/analyse-regular-timetable", method=RequestMethod.GET)
 	public String showPage(ModelMap model){
-		System.out.println(name()+"::showPage");
+		//System.out.println(name()+"::showPage");
+		//rctts.getClassCodeOfCourse();
+		//System.out.println(name()+"::showPage()--return recive:"+rctts.getClassCodeOfCourse());
 		//rctts.countCourseOnSaturday();
 		//model.put("sss",status);
-		List<Integer> test = rctts.getCourseRoom();
-		System.out.println(name()+"::showPage--test get: "+test);
+		//List<Integer> test = rctts.getCourseRoom();
+		//System.out.println(name()+"::showPage--test get: "+test);
 		return "cp.analyseTimetableHomepage";
 	}
 	
@@ -61,7 +70,7 @@ public class mTimeTableController extends BaseWeb{
 		//System.out.println(name()+"::uploadFile--"+timetableFile.getOriginalFilename() + " uploaded");
 		
 		if(timetableFile != null){
-			readFile();
+			//readFile();
 		}
 		return "{}";
 	}
@@ -356,17 +365,42 @@ public class mTimeTableController extends BaseWeb{
 		return (iStart+"-"+iEnd);
 	}
 
-	/*@RequestMapping(value="/analyse-timetable")
+	@RequestMapping(value="/analyse-timetable")
 	public String showPageAnalyseResult(ModelMap model){
-		List<mRegularCourseTimeTable> tblrctt = rctts.getAllCourseTimeTable();
+		//List<mRegularCourseTimeTable> tblrctt = rctts.getAllCourseTimeTable();
+		List<Integer> numSlotCourse= rctts.getAllNumberSlot();
+		List<Integer> cSlot = rctts.getAllSlotsStart();
+		List<Integer> cDay = rctts.getAllDayValid();
+		List<String> cClassCode = rctts.getClassCodeOfCourse();
+		List<String> cSemesterType = rctts.getCourseSemesterType();
+		List<Integer> courseRoom = rctts.getCourseRoom();
+		List<Integer> rCapacity = mrs.getListRoomCapacity();
+		List<Integer> maxRegister = rctts.getCourseMaxRegister();
+		List<Set<Integer>> listWeek= rctts.getListSetWeek();
+		int maxNumRoom=mrs.getNumberRoom(); 
 		
-		analyseTimeTable analysist = new analyseTimeTable();
-		int nCourseOnSaturday = analysist.countCourseOnSaturday(tblrctt);
-		int nCourseOnSaturdayInTCandD9 = analysist.countCourseOnSaturdayInTCandD9(tblrctt);
-		
+		TimeTable tt = new TimeTable(cSlot,numSlotCourse, cDay, cClassCode, cSemesterType, courseRoom, rCapacity, maxRegister,listWeek,maxNumRoom);
+		tt.stateModel();
+		//int nCourseOnSaturday = analysist.countCourseOnSaturday(tblrctt);
+		//int nCourseOnSaturdayInTCandD9 = analysist.countCourseOnSaturdayInTCandD9(tblrctt);
+		int nCourseOnSaturday = tt.getNumberOfCourseOnSaturday();
 		model.put("nCourseOnSaturday", nCourseOnSaturday);
-		model.put("nCourseOnSaturdayInTCandD9", nCourseOnSaturdayInTCandD9);
 		
+		int nPlotOfCourse = tt.getPlotOfCourse();
+		model.put("nPlotOfCourse", nPlotOfCourse);
+		//model.put("nCourseOnSaturdayInTCandD9", nCourseOnSaturdayInTCandD9);
+		
+		int nFitRoom = tt.getFitRoom();
+		model.put("nFitRoom", nFitRoom);
+		System.out.println("This is list Room Conflict contructor:");
+		HashMap<Integer, List<Set<Integer>>> map= tt.getListRoomConflict();
+		System.out.println("This is list Room Conflict:");
+		Iterator<Integer> it = map.keySet().iterator();
+		while (it.hasNext()){
+			System.out.println(map.get(it.next()));
+		}
+		int roomConflict=tt.getComputeRoomsConflict();
+		model.put("roomConflict", roomConflict);
 		return "cp.analyseTimetableResultPage";
-	}*/
+	}
 }

@@ -440,4 +440,41 @@ public class mRegularCourseTimeTableDAOImpl extends BaseDao implements mRegularC
 			close();
 		}
 	}
+	@Override 
+    public List<Integer[]> getPairCourseFragmented() { 
+        // TODO Auto-generated method stub 
+        try{ 
+             
+            begin(); 
+            String hql =  "SELECT rctte.RCTTE_Class_Code, rctte.RCTTE_Semester_Type FROM mRegularCourseTimeTable rctt, mRegularCourseTimeTableEntry rctte" 
+                    + " WHERE rctt.RCTT_RCTTE_Code = rctte.RCTTE_Code"; 
+            Query query = getSession().createQuery(hql); 
+            commit(); 
+            List<Object[]> result = query.list(); 
+            List<Integer[]> return_result = new ArrayList<Integer[]>(); 
+             
+            for(int i=1; i<result.size(); i++){ 
+                if(result.get(i)[0].equals(result.get(i-1)[0])){ 
+                    if(result.get(i)[1].equals("AB")){ 
+                        Integer[] tmp = {i-1,i}; 
+                        return_result.add(tmp); 
+                    } 
+                } 
+            } 
+             
+            //System.out.println(name()+"::getClassCodeOfCourse--result"+query.list()); 
+            return return_result; 
+             
+        }catch(HibernateException e){ 
+            e.printStackTrace(); 
+            rollback(); 
+            close(); 
+            return null; 
+        }finally{ 
+            flush(); 
+            close(); 
+        } 
+         
+    } 
+
 }

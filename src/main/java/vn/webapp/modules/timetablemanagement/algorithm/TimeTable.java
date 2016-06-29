@@ -42,7 +42,7 @@ public class TimeTable {
 		return "algorithm.TimeTable";
 	}
 	
-	public TimeTable(List<Integer> cSlot,List<Integer> numSlotsCourse, List<Integer> cDay, List<String> cClassCode, List<String> cSemesterType, 
+	public TimeTable(List<Integer> cSlot,List<Integer> numSlotsCourse, List<Integer> cDay, List<Integer[]> pairCourseFragmented, 
 			List<Integer> cRoom, List<Integer> rCapacity, List<Integer> maxRegister,List<Set<Integer>> listWeek,int maxNumRoom){
 		nCourse = cSlot.size();
 		
@@ -61,8 +61,8 @@ public class TimeTable {
 		for(int i=0; i<nCourse;i++){
 			courseSlot[i] = cSlot.get(i);
 			courseDay[i] = cDay.get(i);
-			classCodeOfCourse[i] = cClassCode.get(i);
-			courseSemesterType[i] = cSemesterType.get(i);
+			//classCodeOfCourse[i] = cClassCode.get(i);
+			//courseSemesterType[i] = cSemesterType.get(i);
 			courseRoom[i] = cRoom.get(i);
 			maxCourseRegister[i] = maxRegister.get(i);
 		}

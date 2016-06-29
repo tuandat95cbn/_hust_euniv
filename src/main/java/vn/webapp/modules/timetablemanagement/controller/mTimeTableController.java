@@ -3,7 +3,6 @@ package vn.webapp.modules.timetablemanagement.controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -70,7 +69,7 @@ public class mTimeTableController extends BaseWeb{
 		//System.out.println(name()+"::uploadFile--"+timetableFile.getOriginalFilename() + " uploaded");
 		
 		if(timetableFile != null){
-			//readFile();
+			readFile();
 		}
 		return "{}";
 	}
@@ -103,6 +102,12 @@ public class mTimeTableController extends BaseWeb{
 				row = sheet.getRow(i);
 				//row_value.clear();
 				if(row != null){
+					
+					//get course_stage
+					String course_stage = row.getCell(21).getStringCellValue();
+					if(course_stage.equals("Huỷ lớp")){
+						continue;
+					}
 					
 					//get rctte_class_type
 					String RCTTE_Class_Type = row.getCell(16).getStringCellValue();
@@ -371,36 +376,32 @@ public class mTimeTableController extends BaseWeb{
 		List<Integer> numSlotCourse= rctts.getAllNumberSlot();
 		List<Integer> cSlot = rctts.getAllSlotsStart();
 		List<Integer> cDay = rctts.getAllDayValid();
-		List<String> cClassCode = rctts.getClassCodeOfCourse();
-		List<String> cSemesterType = rctts.getCourseSemesterType();
+		List<Integer[]> pairCourseFragmented = rctts.getPairCourseFragmented();
+		System.out.println(name()+"::showPageAnalyseResult--pairCourseFragmented:{");
+		for(int i=0; i<pairCourseFragmented.size();i++){
+			System.out.print("["+pairCourseFragmented.get(i)[0]+","+pairCourseFragmented.get(i)[1]+"]");
+		}
+		//List<String> cSemesterType = rctts.getCourseSemesterType();
 		List<Integer> courseRoom = rctts.getCourseRoom();
 		List<Integer> rCapacity = mrs.getListRoomCapacity();
 		List<Integer> maxRegister = rctts.getCourseMaxRegister();
 		List<Set<Integer>> listWeek= rctts.getListSetWeek();
 		int maxNumRoom=mrs.getNumberRoom(); 
 		
-		TimeTable tt = new TimeTable(cSlot,numSlotCourse, cDay, cClassCode, cSemesterType, courseRoom, rCapacity, maxRegister,listWeek,maxNumRoom);
+		TimeTable tt = new TimeTable(cSlot,numSlotCourse, cDay, pairCourseFragmented, courseRoom, rCapacity, maxRegister,listWeek,maxNumRoom);
 		tt.stateModel();
 		//int nCourseOnSaturday = analysist.countCourseOnSaturday(tblrctt);
 		//int nCourseOnSaturdayInTCandD9 = analysist.countCourseOnSaturdayInTCandD9(tblrctt);
 		int nCourseOnSaturday = tt.getNumberOfCourseOnSaturday();
 		model.put("nCourseOnSaturday", nCourseOnSaturday);
 		
-		int nPlotOfCourse = tt.getPlotOfCourse();
-		model.put("nPlotOfCourse", nPlotOfCourse);
+		int nPairCourseFragmented = pairCourseFragmented.size();
+		model.put("nPairCourseFragmented", nPairCourseFragmented);
 		//model.put("nCourseOnSaturdayInTCandD9", nCourseOnSaturdayInTCandD9);
 		
 		int nFitRoom = tt.getFitRoom();
 		model.put("nFitRoom", nFitRoom);
-		System.out.println("This is list Room Conflict contructor:");
-		HashMap<Integer, List<Set<Integer>>> map= tt.getListRoomConflict();
-		System.out.println("This is list Room Conflict:");
-		Iterator<Integer> it = map.keySet().iterator();
-		while (it.hasNext()){
-			System.out.println(map.get(it.next()));
-		}
-		int roomConflict=tt.getComputeRoomsConflict();
-		model.put("roomConflict", roomConflict);
+		
 		return "cp.analyseTimetableResultPage";
 	}
 }

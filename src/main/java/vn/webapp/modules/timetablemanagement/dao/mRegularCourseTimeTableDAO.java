@@ -24,4 +24,5 @@ public interface mRegularCourseTimeTableDAO {
 	public List<String> getClassCodeOfCourse();
 	
 	public List<Integer> getMaxCoursesRegister();
+	public List<Integer[]> getPairCourseFragmented();
 }

@@ -23,4 +23,5 @@ public interface mRegularCourseTimeTableService {
 	public List<String> getClassCodeOfCourse();
 	public List<Integer> getCourseMaxRegister();
 	public List<Set<Integer>> getListSetWeek();
+	public List<Integer[]> getPairCourseFragmented();
 }

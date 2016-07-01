@@ -11,6 +11,7 @@ import localsearch.model.IConstraint;
 import localsearch.model.IFunction;
 import localsearch.model.LocalSearchManager;
 import localsearch.model.VarIntLS;
+import vn.webapp.modules.timetablemanagement.model.mRoomFree;
 
 public class TimeTable {
 
@@ -21,8 +22,6 @@ public class TimeTable {
 	int[] roomCapacity;
 	int[] maxCourseRegister;
 	int maxNumRoom;
-	String[] classCodeOfCourse;
-	String[] courseSemesterType;
 	
 	LocalSearchManager mgr;
 	ConstraintSystem S;
@@ -37,6 +36,7 @@ public class TimeTable {
 	FitRoom nFitRoom;
 	IConstraint computeRoomConflict;
 	int []numSlotsCourse;
+	ComputeRooms mCR;
 	
 	public String name(){
 		return "algorithm.TimeTable";
@@ -48,8 +48,6 @@ public class TimeTable {
 		
 		courseSlot = new int[nCourse];
 		courseDay = new int[nCourse];
-		classCodeOfCourse = new String[nCourse];
-		courseSemesterType = new String[nCourse];
 		courseRoom = new int[nCourse];
 		roomCapacity = new int[rCapacity.size()];
 		maxCourseRegister = new int[nCourse];
@@ -86,21 +84,29 @@ public class TimeTable {
 //			System.out.print("maxCourseRegister["+i+"]"+maxCourseRegister[i]);
 			
 			x_slot[i] = new VarIntLS(mgr, 0,11);
-			x_day[i] = new VarIntLS(mgr, 0,6);
-			System.out.println("maxNumRoom is"+maxNumRoom);
+			x_day[i] = new VarIntLS(mgr, 0,5);
 			x_room[i] = new VarIntLS(mgr, 1, maxNumRoom);
 			x_room[i].setValue(courseRoom[i]);
 			x_day[i].setValue(courseDay[i]);
 			x_slot[i].setValue(courseSlot[i]);
 		}
 		
-		nCourseOnSaturday = new Occurrence(x_day, 7);
-		nCoursePlot = new FuncCountPlotOfCourses(classCodeOfCourse, courseSemesterType, x_day);
+		nCourseOnSaturday = new Occurrence(x_day, 5);
 		
 		nFitRoom = new FitRoom(x_room, roomCapacity, maxCourseRegister);
 		computeRoomConflict = new ComputeRoomConflict(x_day,x_slot, numSlotsCourse, x_room, listWeek, 0, 20);
 		S.post(nFitRoom);
 		S.post(computeRoomConflict);
+		int day[]= new int[x_day.length];
+		int slot[]= new int [x_slot.length];
+		int room[]= new int [x_room.length];
+		for(int i=0;i<x_day.length;i++ )
+			day[i]=x_day[i].getValue();
+		for(int i=0;i<x_slot.length;i++ )
+			slot[i]=x_slot[i].getValue();
+		for(int j=0;j<x_room.length;j++)
+			room[j]=x_room[j].getValue();
+		mCR= new ComputeRooms(day, slot, numSlotsCourse, room, listWeek, 0, 20, maxNumRoom, x_slot[0].getMaxValue()+1);
 		mgr.close();
 	}
 	
@@ -108,9 +114,6 @@ public class TimeTable {
 		return nCourseOnSaturday.getValue();
 	}
 	
-	public int getPlotOfCourse(){
-		return nCoursePlot.getValue();
-	}
 	
 	public int getFitRoom(){
 		int result = nFitRoom.getCoursesInvalid().size();
@@ -123,17 +126,14 @@ public class TimeTable {
 	}
 	
 	public HashMap<Integer , List<Set<Integer> > > getListRoomConflict(){
-		int day[]= new int[x_day.length];
-		int slot[]= new int [x_slot.length];
-		int room[]= new int [x_room.length];
-		for(int i=0;i<x_day.length;i++ )
-			day[i]=x_day[i].getValue();
-		for(int i=0;i<x_slot.length;i++ )
-			slot[i]=x_slot[i].getValue();
-		for(int j=0;j<x_room.length;j++)
-			room[j]=x_room[j].getValue();
-		ComputeRooms mCR= new ComputeRooms(day, slot, numSlotsCourse, room, listWeek, 0, 20, maxNumRoom, x_slot[0].getMaxValue()+1);
+		
 		System.out.println("init complete");
 		return mCR.getAllRoomConflict();
+	}
+	
+	public List<mRoomFree> getListRoomFree(){
+		System.out.println(name()+"getListRoomFree");
+		return mCR.getListRoomsFree();
+		
 	}
 }

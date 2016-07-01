@@ -9,6 +9,7 @@ import java.util.Set;
 import localsearch.model.LocalSearchManager;
 import localsearch.model.VarIntLS;
 import localsearch.selectors.MaxSelector;
+import vn.webapp.modules.timetablemanagement.model.mRoomFree;
 
 public class ComputeRooms {
 	private int[] xd;
@@ -38,14 +39,17 @@ public class ComputeRooms {
 		mark=new int [we+1][7*maxSlot_day][maxNumRoom+1];
 		d=new int [we+1][7*maxSlot_day][maxNumRoom+1];
 		for(int i=0;i<we+1;i++)
-			for(int j=0;j<maxSlot_day;j++)
+			for(int j=0;j<maxSlot_day*7;j++)
 				for(int k=0;k<maxNumRoom;k++)
 					d[i][j][k]=-1;
 		for(int j=0;j<xd.length;j++){
+			if(j==1424)
+			System.out.println(xd[j]+" "+xs[j]+" "+xr[j]+" "+w.get(j)+" "+ns[j]);
 			Set<Integer> s= w.get(j);
 			for(Integer h: s){
 				for(int k=xd[j]*maxSlot_day+xs[j];k<xd[j]*maxSlot_day+xs[j]+ns[j];k++){
-					System.out.println("This is  h k j xr[j]"+h+" "+k+" "+j+" "+xr[j]);
+					//System.out.println("This is  h k j xr[j]"+h+" "+k+" "+j+" "+xr[j]);
+					System.out.println("ComputeRooms "+h+" "+k+" "+j+" "+xr[j] );
 					if(mark[h][k][xr[j]]==0){
 						Set set = new HashSet<>();
 						set.add(j);
@@ -68,6 +72,9 @@ public class ComputeRooms {
 			//System.out.println(list_set.get(i));
 		
 		//print();
+		System.out.println("This is mark"+0*maxSlot_day+9+" "+ mark[18][0*maxSlot_day+9][1]);
+		System.out.println("This is mark"+0*maxSlot_day+10+" "+ mark[18][0*maxSlot_day+10][1]);
+		
 	}
 	public void print(){
 		System.out.println("ComputeRoomConflict *************************");
@@ -89,7 +96,7 @@ public class ComputeRooms {
 		System.out.println("ComputeRoomConflict d*************************");
 		for(int i=ws;i<we;i++){
 			System.out.println("This is week " +i+" maxSlot_day:"+maxSlot_day+" maxNumRoom :"+maxNumRoom);
-			for(int j=0;j<maxSlot_day;j++){
+			for(int j=0;j<maxSlot_day*7;j++){
 				
 				for(int k=0;k<maxNumRoom;k++){
 					System.out.print(d[i][j][k]+" ");
@@ -102,13 +109,10 @@ public class ComputeRooms {
 	}
 	public HashMap<Integer , List<Set<Integer> > > getAllRoomConflict(){
 		System.out.println("This is numSlots");
-		for(int i =0;i<ns.length;i++){
-			System.out.println(i+" "+ns[i]);
-		}
 		HashMap<Integer , List<Set<Integer> > > hash= new HashMap<>();
-		for(int i=ws;i<we;i++){
+		for(int i=ws;i<we+1;i++){
 			List<Set<Integer>> l= new ArrayList<>();
-			for(int j=0;j<maxSlot_day;j++){
+			for(int j=0;j<maxSlot_day*7;j++){
 				for(int k=0;k<maxNumRoom;k++){
 					if(mark[i][j][k]>1){
 						Set set= list_set.get(d[i][j][k]);
@@ -120,7 +124,115 @@ public class ComputeRooms {
 		}
 		return hash;
 	}
-	
-	
+	public String name(){
+		return "ComputeRooms";
+	}
+	public List<mRoomFree> getListRoomsFree(){
+		List<mRoomFree> l= new ArrayList<>();
+		System.out.println(name()+"getListRoomsFree");
+		for(int i=0;i<maxNumRoom;i++){
+			for(int j=0;j<5;j++){
+				int slotStart=-1;
+				for(int k=0;k<maxSlot_day/2;k++){
+					boolean xd=true;
+					for(int h=ws;h<we+1;h++)
+						if(mark[h][j*maxSlot_day+ k][i]!=0) xd=false;
+					
+					
+					
+					if(xd==true){
+						if(slotStart==-1) slotStart=k;
+					}
+					if(xd==false){
+						if(slotStart!=-1) {
+							if((k-slotStart)>=2) {
+								mRoomFree r= new mRoomFree();
+								r.setId(i);
+								r.setDay(j);
+								r.setFreeFullPeroids(true);
+								r.setSlotEnd(k-1);
+								r.setSlotStart(slotStart);
+								Set s= new HashSet<>();
+								
+								for(int ii=ws;ii<we+1;ii++){
+									s.add(ii);
+								}
+								r.setSetWeeksFree(s);
+								l.add(r);
+							}
+							slotStart=-1;
+						}
+					}
+				}
+				if(slotStart!=-1)
+				if((maxSlot_day/2-slotStart)>=2) {
+					mRoomFree r= new mRoomFree();
+					r.setId(i);
+					r.setDay(j);
+					r.setFreeFullPeroids(true);
+					r.setSlotEnd(maxSlot_day/2-1);
+					r.setSlotStart(slotStart);
+					Set s= new HashSet<>();
+					
+					for(int ii=ws;ii<we+1;ii++){
+						s.add(ii);
+					}
+					r.setSetWeeksFree(s);
+					l.add(r);
+					slotStart=-1;
+				}
+				
+				slotStart=-1;
+				for(int k=maxSlot_day/2;k<maxSlot_day;k++){
+					boolean xd=true;
+					for(int h=ws;h<we+1;h++)
+						if(mark[h][j*maxSlot_day+ k][i]!=0) xd=false;
+					
+					if(xd==true){
+						if(slotStart==-1) slotStart=k;
+					}
+					if(xd==false){
+						if(slotStart!=-1) {
+							if((k-slotStart)>=2) {
+								mRoomFree r= new mRoomFree();
+								r.setId(i);
+								r.setDay(j);
+								r.setFreeFullPeroids(true);
+								r.setSlotEnd(k-1);
+								r.setSlotStart(slotStart);
+								Set s= new HashSet<>();
+								
+								for(int ii=ws;ii<we+1;ii++){
+									s.add(ii);
+								}
+								r.setSetWeeksFree(s);
+								l.add(r);
+							}
+							slotStart=-1;
+						}
+					}
+				}
+				if(slotStart!=-1)
+				if((maxSlot_day-slotStart)>=2) {
+					mRoomFree r= new mRoomFree();
+					r.setId(i);
+					r.setDay(j);
+					r.setFreeFullPeroids(true);
+					r.setSlotEnd(maxSlot_day-1);
+					r.setSlotStart(slotStart);
+					Set s= new HashSet<>();
+					
+					for(int ii=ws;ii<we+1;ii++){
+						s.add(ii);
+					}
+					r.setSetWeeksFree(s);
+					l.add(r);
+					slotStart=-1;
+				}
+				
+			}
+		}
+		return l;
+	}
 
 }

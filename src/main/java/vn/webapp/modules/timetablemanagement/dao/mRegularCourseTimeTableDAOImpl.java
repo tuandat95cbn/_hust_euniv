@@ -188,7 +188,7 @@ public class mRegularCourseTimeTableDAOImpl extends BaseDao implements mRegularC
 			List<Integer> listInt= new ArrayList<>();
 			for(int i=0;i<l.size();i++){
 				String s= l.get(i);
-				listInt.add(Integer.parseInt(s.substring(s.indexOf("-")+1,s.length())) -Integer.parseInt(s.substring(0, s.indexOf("-"))));
+				listInt.add(Integer.parseInt(s.substring(s.indexOf("-")+1,s.length())) -Integer.parseInt(s.substring(0, s.indexOf("-")))+1);
 			}
 			commit();
 			return listInt;

@@ -3,6 +3,7 @@ package vn.webapp.modules.timetablemanagement.controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import vn.webapp.controller.BaseWeb;
 import vn.webapp.modules.timetablemanagement.algorithm.TimeTable;
 import vn.webapp.modules.timetablemanagement.model.mRegularCourseTimeTable;
+import vn.webapp.modules.timetablemanagement.model.mRoomFree;
 import vn.webapp.modules.timetablemanagement.service.mRegularCourseTimeTableEntryService;
 import vn.webapp.modules.timetablemanagement.service.mRegularCourseTimeTableService;
 import vn.webapp.modules.timetablemanagement.service.mRoomsService;
@@ -401,7 +403,20 @@ public class mTimeTableController extends BaseWeb{
 		
 		int nFitRoom = tt.getFitRoom();
 		model.put("nFitRoom", nFitRoom);
+		System.out.println("This is list Room Conflict contructor:");
+		HashMap<Integer, List<Set<Integer>>> map= tt.getListRoomConflict();
+		System.out.println("This is list Room Conflict:");
+		Iterator<Integer> it = map.keySet().iterator();
+		while (it.hasNext()){
+			System.out.println(map.get(it.next()));
+		}
+		int roomConflict=tt.getComputeRoomsConflict();
+		model.put("roomConflict", roomConflict);
 		
+		List<mRoomFree> lr= tt.getListRoomFree();
+		for(int i=0;i<lr.size();i++){
+			System.out.println(lr.get(i).toString());
+		}
 		return "cp.analyseTimetableResultPage";
 	}
 }

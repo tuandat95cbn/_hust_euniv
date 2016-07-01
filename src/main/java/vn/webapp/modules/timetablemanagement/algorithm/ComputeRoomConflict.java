@@ -37,7 +37,7 @@ public class ComputeRoomConflict extends AbstractInvariant implements IConstrain
 	int mark[][][];
 	
 	public ComputeRoomConflict(VarIntLS[] xd,VarIntLS []xs, int []ns,VarIntLS[] room, List<Set<Integer>> weeks,int ws,int we){
-		System.out.println("ComputeRoomConflict start");
+		
 		this.xd=xd;
 		this.xs=xs;
 		this.xr=room;
@@ -55,12 +55,11 @@ public class ComputeRoomConflict extends AbstractInvariant implements IConstrain
 		for(int i=0;i<xr.length;i++)
 			map.put(xr[i], i+xd.length+xs.length);
 		mark=new int [we+1][(xd[0].getMaxValue()+1)*(xs[0].getMaxValue()+1)][xr[0].getMaxValue()+1];
-		System.out.println("Size of mark"+we+1 +" "+(xd[0].getMaxValue()+1)*(xs[0].getMaxValue()+1)+" "+xr[0].getMaxValue()+1);
-		//d= new int[xd.length][xr.length];
+		
 		ls=room[0].getLocalSearchManager();
-		//ls.post(this);
+		
 		post();
-		System.out.println("ComputeRoomConflict end");
+		
 	}
 	
 	void post(){
@@ -223,7 +222,7 @@ public class ComputeRoomConflict extends AbstractInvariant implements IConstrain
 
 			
 		}
-		print();
+		//print();
 		
 	}
 	
@@ -284,7 +283,7 @@ public class ComputeRoomConflict extends AbstractInvariant implements IConstrain
 					mark[h][k][xr[v].getValue()]--;
 				}
 			}
-			print();
+			//print();
 			return del;
 			
 		}else if(v0<(xs.length+xd.length)){
@@ -320,7 +319,7 @@ public class ComputeRoomConflict extends AbstractInvariant implements IConstrain
 					mark[h][k][xr[v].getValue()]--;
 				}
 			}
-			print();
+			//print();
 			return del;
 		
 			
@@ -437,7 +436,7 @@ public class ComputeRoomConflict extends AbstractInvariant implements IConstrain
 					mark[h][k][xr[vv].getValue()]--;
 				}
 			}
-			print();
+			//print();
 			return del;
 			
 		}else if(v0<(xd.length+xs.length)){
@@ -502,7 +501,7 @@ public class ComputeRoomConflict extends AbstractInvariant implements IConstrain
 					mark[h][k][xr[vv].getValue()]--;
 				}
 			}
-			print();
+			//print();
 			return del;
 			
 		} else {

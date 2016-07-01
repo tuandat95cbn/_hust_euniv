@@ -14,7 +14,7 @@
             <ul>
             	<li>Số môn học vào thứ 7: ${nCourseOnSaturday}</li>
             	<!-- <li>Số môn học ở TC và D9 vào thứ 7 là: ${nCourseOnSaturdayInTCandD9}</li> -->
-            	<li>Số môn học kỳ AB học 2 buổi một tuần là: ${nPlotOfCourse}</li>
+            	<li>Số môn học kỳ AB học 2 buổi một tuần là: ${nCourseOnSaturday}</li>
             	<li>Số môn học xếp vào phòng quá sức chứa là: ${nFitRoom}</li>
             	<li>Số vi phạm về phòng học là: ${roomConflict} </li>
             </ul>

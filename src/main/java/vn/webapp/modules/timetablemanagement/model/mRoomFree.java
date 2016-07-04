@@ -51,5 +51,8 @@ public class mRoomFree {
 		this.day = day;
 	}
 	
+	public int getNumSlot(){
+		return slotEnd-slotStart+1;
+	}
 
 }

@@ -200,8 +200,6 @@ public class ComputeRoomConflict extends AbstractInvariant implements IConstrain
 		} else {
 			int v=v0-xd.length-xs.length;
 			Set<Integer> s= w.get(v);
-			System.out.println("Propagate room"+v);
-			System.out.println(s);
 			for(Integer h: s){
 				for(int k=xd[v].getValue()*12+xs[v].getValue();k<xd[v].getValue()*12+xs[v].getValue()+ns[v];k++){
 					if(mark[h][k][arg0.getOldValue()]>1) {

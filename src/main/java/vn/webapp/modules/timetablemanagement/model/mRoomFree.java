@@ -9,6 +9,13 @@ public class mRoomFree {
 	private int slotStart;
 	private int slotEnd;
 	private int day;
+	private String R_Building;
+	public String getR_Building() {
+		return R_Building;
+	}
+	public void setR_Building(String r_Building) {
+		R_Building = r_Building;
+	}
 	public int getId() {
 		return id;
 	}

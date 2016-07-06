@@ -25,4 +25,5 @@ public interface mRegularCourseTimeTableDAO {
 	
 	public List<Integer> getMaxCoursesRegister();
 	public List<Integer[]> getPairCourseFragmented();
+	public List getCoursesOnSaturday();
 }

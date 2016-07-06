@@ -113,4 +113,10 @@ public class mRegularCourseTimeTableServiceImpl implements mRegularCourseTimeTab
 		// TODO Auto-generated method stub
 		return dao.getPairCourseFragmented();
 	}
+	
+	@Override
+	public List getCoursesOnSaturday() {
+		// TODO Auto-generated method stub
+		return dao.getCoursesOnSaturday();
+	}
 }

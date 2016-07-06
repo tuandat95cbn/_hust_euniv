@@ -1,6 +1,9 @@
 package vn.webapp.modules.timetablemanagement.algorithm;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +13,8 @@ import localsearch.model.LocalSearchManager;
 import localsearch.model.VarIntLS;
 import localsearch.selectors.MaxSelector;
 import vn.webapp.modules.timetablemanagement.model.mRoomFree;
+
+
 
 public class ComputeRooms {
 	private int[] xd;
@@ -25,6 +30,7 @@ public class ComputeRooms {
 	List<Set<Integer>> list_set= new ArrayList<>();
 	int maxNumRoom=0;
 	int maxSlot_day=0;
+	
 	
 	public ComputeRooms(int []day,int []slots,int []ns,int []room, List<Set<Integer>> weeks,int ws,int we,int maxNumRoom,int maxSlot_day){
 		this.xd=day;
@@ -51,16 +57,16 @@ public class ComputeRooms {
 					//System.out.println("This is  h k j xr[j]"+h+" "+k+" "+j+" "+xr[j]);
 					System.out.println("ComputeRooms "+h+" "+k+" "+j+" "+xr[j] );
 					if(mark[h][k][xr[j]]==0){
-						Set set = new HashSet<>();
-						set.add(j);
-						list_set.add(set);
-						d[h][k][xr[j]]=list_set.indexOf(set);
+//						Set set = new HashSet<>();
+//						set.add(j);
+//						list_set.add(set);
+//						d[h][k][xr[j]]=list_set.indexOf(set);
 						mark[h][k][xr[j]]=1;
 					}else{
 						mark[h][k][xr[j]]+=1;
-						Set set= list_set.get(d[h][k][xr[j]]);
-						set.add(j);
-						list_set.set(d[h][k][xr[j]], set);
+//						Set set= list_set.get(d[h][k][xr[j]]);
+//						set.add(j);
+//						list_set.set(d[h][k][xr[j]], set);
 					}
 				}
 			}
@@ -130,7 +136,7 @@ public class ComputeRooms {
 	public List<mRoomFree> getListRoomsFree(){
 		List<mRoomFree> l= new ArrayList<>();
 		System.out.println(name()+"getListRoomsFree");
-		for(int i=0;i<maxNumRoom;i++){
+		for(int i=1;i<maxNumRoom;i++){
 			for(int j=0;j<5;j++){
 				int slotStart=-1;
 				for(int k=0;k<maxSlot_day/2;k++){
@@ -233,6 +239,32 @@ public class ComputeRooms {
 			}
 		}
 		return l;
+	}
+	static HashMap<String , Integer> mapBuilding;
+	public List<mRoomFree> sortListRoomsFreebyNumSlotBuilding(HashMap<String, Integer> map,List<mRoomFree> list){
+		mapBuilding=map;
+		System.out.println(name()+"getListRoomsFreeSort");
+		
+		//Comparator<mRoomFree> c = new RoomFreeComparator();
+	
+		Collections.sort(list, new Comparator<mRoomFree>() {
+
+			@Override
+			public int compare(mRoomFree r1, mRoomFree r2) {
+				// TODO Auto-generated method stub
+				if  (r1.getNumSlot()>r2.getNumSlot()) return 1;
+				else if(r1.getNumSlot()==r2.getNumSlot()){
+					if(mapBuilding.get(r1.getR_Building())> mapBuilding.get(r2.getR_Building())) return 1;
+					else if(mapBuilding.get(r1.getR_Building())== mapBuilding.get(r2.getR_Building())) return 0;
+					else return -1;
+				}
+				return -1;
+			}
+		});
+		
+		
+		
+		return list;
 	}
 
 }

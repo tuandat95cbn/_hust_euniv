@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import vn.webapp.dao.BaseDao;
+import vn.webapp.modules.timetablemanagement.model.courseOnSaturday;
 import vn.webapp.modules.timetablemanagement.model.mRegularCourseTimeTable;
 @Repository
 @SuppressWarnings({"unchecked", "rawtypes"})
@@ -476,5 +477,56 @@ public class mRegularCourseTimeTableDAOImpl extends BaseDao implements mRegularC
         } 
          
     } 
+    public List getCoursesOnSaturday() {
+		// TODO Auto-generated method stub
+		try{
+			begin();
+			//System.out.println(name()+"::countCourseOnSaturday--Start");
+			//Criteria criteria = getSession().createCriteria(mRegularCourseTimeTable.class);
+			String hql = "SELECT rctt.RCTT_ID, rctte.RCTTE_Class_Code, rctte.RCTTE_Course_Credit, rctte.RCTTE_Course_Credit_Detail"
+					+ " FROM mRegularCourseTimeTable rctt, mRegularCourseTimeTableEntry rctte"
+					+ " WHERE rctt.RCTT_RCTTE_Code = rctte.RCTTE_Code and rctt.RCTT_Day = '7'"
+					+ " ORDER BY rctte.RCTTE_Course_Credit ASC";
+			//int result = ((Long)getSession().createQuery(hql).uniqueResult()).intValue();
+			Query query = getSession().createQuery(hql);
+			List<Object[]> qresult = query.list();
+			
+			List<courseOnSaturday> result = new ArrayList<courseOnSaturday>();
+			
+			
+			//System.out.println(name()+"::getCoursesOnSaturday");
+			for(int i=0; i<qresult.size(); i++){
+				courseOnSaturday tmp = new courseOnSaturday();
+				//System.out.println("course "+i);
+				
+				tmp.setID((int)qresult.get(i)[0]);
+				
+				//System.out.println("classCode: "+qresult.get(i)[0]);
+				tmp.setClassCode((String)qresult.get(i)[1]);
+				
+				//System.out.println("courseCredit: "+qresult.get(i)[1]);
+				tmp.setnCredit((int)qresult.get(i)[2]);
+				
+				//System.out.println("creditDetail: "+qresult.get(i)[2]);
+				tmp.setCreditDetail((String)qresult.get(i)[3]);
+				result.add(tmp);
+				//System.out.println("return result: "+result.get(i).get("classCode"));
+			}
+			
+			//System.out.println(name()+"::countCourseOnSaturday--returnResult: "+ result);
+			//int t=((Object) result.get(0)).intValue();
+			commit();
+			//System.out.println(name()+"::countCourseOnSaturday--returnResult"+result.get(0));
+			return result;
+		}catch(HibernateException e){
+			e.printStackTrace();
+			rollback();
+			close();
+			return null;
+		}finally{
+			flush();
+			close();
+		}
+	}
 
 }

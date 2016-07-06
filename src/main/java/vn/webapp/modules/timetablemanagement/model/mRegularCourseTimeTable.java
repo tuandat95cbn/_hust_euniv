@@ -24,6 +24,20 @@ public class mRegularCourseTimeTable implements Serializable {
 	private String 	RCTT_Slots;
 	private String RCTT_Weeks;
 	private String 	RCTT_Room_Code;
+	private int RCTTE_Course_Credit;
+	private String RCTTE_Course_Credit_Detail;
+	public int getRCTTE_Course_Credit() {
+		return RCTTE_Course_Credit;
+	}
+	public void setRCTTE_Course_Credit(int rCTTE_Course_Credit) {
+		RCTTE_Course_Credit = rCTTE_Course_Credit;
+	}
+	public String getRCTTE_Course_Credit_Detail() {
+		return RCTTE_Course_Credit_Detail;
+	}
+	public void setRCTTE_Course_Credit_Detail(String rCTTE_Course_Credit_Detail) {
+		RCTTE_Course_Credit_Detail = rCTTE_Course_Credit_Detail;
+	}
 	@Formula("length(RCTT_Slots)")
 	private int lengthRCTT_Slots;
 	

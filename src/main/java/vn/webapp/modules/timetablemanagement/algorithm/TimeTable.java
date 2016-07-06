@@ -2,6 +2,8 @@ package vn.webapp.modules.timetablemanagement.algorithm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -12,6 +14,7 @@ import localsearch.model.IFunction;
 import localsearch.model.LocalSearchManager;
 import localsearch.model.VarIntLS;
 import vn.webapp.modules.timetablemanagement.model.mRoomFree;
+import vn.webapp.modules.timetablemanagement.model.mRooms;
 
 public class TimeTable {
 
@@ -30,7 +33,7 @@ public class TimeTable {
 	VarIntLS[] x_room;
 	//VarIntLS[] x_semester;
 	List<Set<Integer>> listWeek;
-	
+	HashMap<String, Integer> mapBuilding; 
 	IFunction nCourseOnSaturday;
 	IFunction nCoursePlot;
 	FitRoom nFitRoom;
@@ -135,5 +138,81 @@ public class TimeTable {
 		System.out.println(name()+"getListRoomFree");
 		return mCR.getListRoomsFree();
 		
+	}
+	
+	public List<mRoomFree> sortListRoomsFreebyNumSlotBuilding(List<mRoomFree> list){
+		System.out.println(name()+"getListRoomFreeSort");
+		return mCR.sortListRoomsFreebyNumSlotBuilding(mapBuilding,list);
+		
+	}
+	
+	public int autoDecreaseNCourseOnSaturday(List<mRoomFree> listRF){
+		
+		int res=0;
+		int dLRF[]= new int[listRF.size()];
+		for(int i=0;i<x_day.length;i++)
+			if(x_day[i].getValue()==5) {
+				boolean xd=false;
+				for(int j=0;j<listRF.size();j++)
+					if (dLRF[j]==0){
+						mRoomFree r= listRF.get(j); 
+						if((r.getNumSlot()>= numSlotsCourse[i] )&&(((r.getSlotStart()<6 ) && (x_slot[i].getValue()<6))||((r.getSlotStart()>=6 ) && (x_slot[i].getValue()>=6))) ) {
+							System.out.println("swap course"+ i  +"to "+r.getDay()+" "+r.getSlotStart()+" "+r.getId());
+							dLRF[j]=1;
+							x_day[i].setValuePropagate(r.getDay());
+							x_slot[i].setValuePropagate(r.getSlotStart());
+							x_room[i].setValuePropagate(r.getId());
+							xd=true;
+							break;
+						}
+					}
+				if(xd==true) res++;
+				else System.out.println("This is bug "+ i);
+			}
+		return res;
+	}
+	
+	
+	public List<mRoomFree> addMoreInformationForRooms(List<mRooms> listR,List<mRoomFree> listRF){
+		/*
+		 * tao hash map building 
+		 */
+		Set<String> setBuilding= new HashSet<>();
+		for(int i=0;i<listR.size();i++){
+			setBuilding.add(listR.get(i).getR_Building());
+		}
+		mapBuilding= new HashMap<>();
+		mapBuilding.put("TC", 0);
+		mapBuilding.put("D3", 1);
+		mapBuilding.put("D5",2);
+		mapBuilding.put("D3-5", 3);
+		setBuilding.remove("TC");
+		setBuilding.remove("D3");
+		setBuilding.remove("D5");
+		setBuilding.remove("D3-5");
+		int ct=4;
+		
+		for(String s: setBuilding){
+			if((s.charAt(0)!='T') || (s.charAt(0)!='D') || (s.length()>=5)) continue;  
+			mapBuilding.put(s, ct);
+			ct++;
+		}
+		Iterator<String> it= mapBuilding.keySet().iterator();
+		while (it.hasNext()){
+			System.out.println(mapBuilding.get(it.next()));
+		}
+		
+		for(int i=0;i<listRF.size();){
+			mRoomFree rF= listRF.get(i);
+			mRooms r= listR.get(rF.getId());
+			if(mapBuilding.get(r.getR_Building())==null){
+				listRF.remove(i);
+				continue;
+			}
+			rF.setR_Building(r.getR_Building());
+			listRF.set(i, rF);
+			i++;
+		}
+				return listRF;
 	}
 }
